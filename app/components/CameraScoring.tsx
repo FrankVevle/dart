@@ -9,6 +9,7 @@ const WORKING_SIZE = 480;
 
 type Marker = { id: number; x: number; y: number; throwResult: DartThrow | null };
 type CalibrationStage = 'none' | 'awaiting-center' | 'awaiting-top';
+type ScoringMode = 'auto' | 'manual';
 
 function formatThrow(t: DartThrow | null): string {
   if (!t) return 'Utenfor';
@@ -54,6 +55,7 @@ export function CameraScoring({ onConfirmThrows }: { onConfirmThrows: (throws: D
 
   const [calibration, setCalibration] = useState<BoardCalibration | null>(null);
   const [calibrationStage, setCalibrationStage] = useState<CalibrationStage>('none');
+  const [mode, setMode] = useState<ScoringMode>('auto');
   const [reviewPhoto, setReviewPhoto] = useState<string | null>(null);
   const [markers, setMarkers] = useState<Marker[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -109,7 +111,8 @@ export function CameraScoring({ onConfirmThrows }: { onConfirmThrows: (throws: D
   }
 
   async function handleThrowPhotoFile(input: HTMLInputElement, file: File | undefined) {
-    if (!file || !calibration || !referenceImageDataRef.current) return;
+    if (!file || !calibration) return;
+    if (mode === 'auto' && !referenceImageDataRef.current) return;
     setError(null);
     setBusy(true);
     try {
@@ -119,21 +122,25 @@ export function CameraScoring({ onConfirmThrows }: { onConfirmThrows: (throws: D
       const ctx = canvas?.getContext('2d');
       if (!canvas || !ctx) return;
       drawContain(ctx, img);
-      const photoData = ctx.getImageData(0, 0, WORKING_SIZE, WORKING_SIZE);
 
-      const blobs = detectChangedBlobs(referenceImageDataRef.current, photoData, {
-        x: calibration.centerX,
-        y: calibration.centerY
-      });
-
-      setMarkers(
-        blobs.map(b => ({
-          id: nextMarkerId.current++,
-          x: b.x,
-          y: b.y,
-          throwResult: pixelToThrow(b.x, b.y, calibration)
-        }))
-      );
+      if (mode === 'auto' && referenceImageDataRef.current) {
+        const photoData = ctx.getImageData(0, 0, WORKING_SIZE, WORKING_SIZE);
+        const blobs = detectChangedBlobs(referenceImageDataRef.current, photoData, {
+          x: calibration.centerX,
+          y: calibration.centerY
+        });
+        setMarkers(
+          blobs.map(b => ({
+            id: nextMarkerId.current++,
+            x: b.x,
+            y: b.y,
+            throwResult: pixelToThrow(b.x, b.y, calibration)
+          }))
+        );
+      } else {
+        // Manual mode: no detection, just start from a blank slate and let the user tap each dart.
+        setMarkers([]);
+      }
       setReviewPhoto(dataUrl);
     } catch {
       setError('Kunne ikke lese bildet. Prøv igjen.');
@@ -180,7 +187,7 @@ export function CameraScoring({ onConfirmThrows }: { onConfirmThrows: (throws: D
         <>
           <p className="camera-hint">
             {calibrationStage === 'none'
-              ? 'Ta ett bilde av den tomme skiva fra samme faste posisjon du kommer til å fotografere fra resten av kampen — kameraet må ikke flytte seg mellom bilder.'
+              ? 'Ta ett bilde av skiva for å kalibrere. Skal du bruke automatisk gjenkjenning senere, må dette bildet vise en TOM skive fra samme faste posisjon du kommer til å fotografere fra resten av kampen — kameraet må ikke flytte seg mellom bilder. Skal du bare registrere manuelt, holder det med et vanlig bilde av skiva.'
               : calibrationStage === 'awaiting-center'
                 ? 'Trykk midt i blinken (bullseye) på bildet under.'
                 : 'Trykk øverst på skiva, rett over midten (ytterkanten av dobbeltringen ved 20-feltet).'}
@@ -218,6 +225,17 @@ export function CameraScoring({ onConfirmThrows }: { onConfirmThrows: (throws: D
           </div>
 
           {!reviewPhoto && (
+            <div className="toggle-group camera-mode-toggle">
+              <button className={mode === 'auto' ? 'active' : ''} onClick={() => setMode('auto')}>
+                Automatisk gjenkjenning
+              </button>
+              <button className={mode === 'manual' ? 'active' : ''} onClick={() => setMode('manual')}>
+                Manuell registrering
+              </button>
+            </div>
+          )}
+
+          {!reviewPhoto && (
             <label className="btn primary camera-upload-btn">
               📷 Ta bilde etter kast
               <input
@@ -233,8 +251,9 @@ export function CameraScoring({ onConfirmThrows }: { onConfirmThrows: (throws: D
           {reviewPhoto && (
             <>
               <p className="camera-hint">
-                Trykk på et feilaktig kast for å fjerne det, eller trykk et sted i bildet for å legge til et kast som ikke ble
-                oppdaget automatisk.
+                {mode === 'auto'
+                  ? 'Trykk på et feilaktig kast for å fjerne det, eller trykk et sted i bildet for å legge til et kast som ikke ble oppdaget automatisk.'
+                  : 'Trykk der hver pil traff skiva for å registrere kastet. Trykk på et kast for å fjerne det igjen.'}
               </p>
               <div className="camera-review-wrapper" onClick={handleReviewClick}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
