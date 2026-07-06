@@ -1,9 +1,16 @@
+// Exact board location of a single dart: segment 1-20, or 25 for the bull (multiplier 2 = bullseye/50).
+export interface DartThrow {
+  segment: number;
+  multiplier: 1 | 2 | 3;
+}
+
 export interface DartPlayer {
   id: string;
   name: string;
   currentScore: number;
   legsWon: number;
   history: number[][][]; // history[legIndex][turnIndex] = darts, e.g. [[[20,60,5],[20,20,20]], [[60,60,60]]]
+  dartsThrown: DartThrow[]; // every real (non-miss) dart this player has thrown, for board visualization
 }
 
 export interface MatchConfig {
@@ -52,7 +59,8 @@ export class DartsMatchEngine {
       name,
       currentScore: config.startingScore,
       legsWon: 0,
-      history: [[]] // one turn-array per leg, starting with leg 1
+      history: [[]], // one turn-array per leg, starting with leg 1
+      dartsThrown: []
     }));
     this.onChange = onChange;
   }
@@ -67,7 +75,11 @@ export class DartsMatchEngine {
       state.config,
       onChange
     );
-    engine.players = state.players.map(p => ({ ...p, history: p.history.map(leg => leg.map(turn => [...turn])) }));
+    engine.players = state.players.map(p => ({
+      ...p,
+      history: p.history.map(leg => leg.map(turn => [...turn])),
+      dartsThrown: p.dartsThrown.map(d => ({ ...d }))
+    }));
     engine.currentPlayerIndex = state.currentPlayerIndex;
     engine.currentTurnDarts = [...state.currentTurnDarts];
     engine.isLegOver = state.isLegOver;
@@ -82,7 +94,11 @@ export class DartsMatchEngine {
    */
   public toJSON(): MatchState {
     return {
-      players: this.players.map(p => ({ ...p, history: p.history.map(leg => leg.map(turn => [...turn])) })),
+      players: this.players.map(p => ({
+        ...p,
+        history: p.history.map(leg => leg.map(turn => [...turn])),
+        dartsThrown: p.dartsThrown.map(d => ({ ...d }))
+      })),
       currentPlayerIndex: this.currentPlayerIndex,
       config: this.config,
       currentTurnDarts: [...this.currentTurnDarts],
@@ -114,19 +130,24 @@ export class DartsMatchEngine {
   }
 
   /**
-   * Records a single dart throw (e.g., Single 20 = 20, Triple 20 = 60, Double Bull = 50)
-   * @param value The raw point value calculated (multiplier * segment)
-   * @param isDouble Whether the hit was specifically a double (crucial for double-out validation)
+   * Records a single dart throw by its exact board location.
+   * @param segment 1-20 for a numbered wedge, 25 for the bull, or 0 for a miss
+   * @param multiplier 1 = single/outer-bull, 2 = double/bullseye, 3 = triple (bull has no triple)
    */
   public throwDart(
-    value: number,
-    isDouble: boolean = false
+    segment: number,
+    multiplier: 1 | 2 | 3 = 1
   ): { status: 'valid' | 'bust' | 'leg-win' | 'match-win'; scoreRemaining: number } {
     if (this.isMatchOver) throw new Error('Match has already concluded.');
     if (this.isLegOver) throw new Error('Leg has concluded. Call startNextLeg().');
     if (this.currentTurnDarts.length >= 3) throw new Error('Turn already complete. Call commitTurn().');
 
     const player = this.getActivePlayer();
+    const value = segment * multiplier;
+    const isDouble = multiplier === 2;
+
+    // A miss (segment 0) has no real board location, so it isn't recorded for visualization.
+    if (segment > 0) player.dartsThrown.push({ segment, multiplier });
 
     // Calculate what the score *would* be if this dart counts
     const currentTurnTotal = this.currentTurnDarts.reduce((a, b) => a + b, 0) + value;

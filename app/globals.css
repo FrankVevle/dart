@@ -343,3 +343,30 @@ details summary {
   font-size: 0.9rem;
   margin-bottom: 8px;
 }
+
+.section-title {
+  font-size: 1rem;
+  margin: 0 0 14px;
+  color: #e6edf3;
+}
+
+.dartboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.dartboard-cell {
+  text-align: center;
+}
+
+.dartboard-cell-title {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  color: #e6edf3;
+}
+
+.dartboard-cell-count {
+  color: #8b949e;
+  font-weight: 400;
+}

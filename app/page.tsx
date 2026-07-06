@@ -2,9 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { DartsMatchEngine, MatchConfig, MatchState } from '@/lib/DartsMatchEngine';
+import { DartBoard } from './components/DartBoard';
 
 const STORAGE_KEY = 'darts-match-state';
 const SEGMENTS = Array.from({ length: 20 }, (_, i) => i + 1);
+const PLAYER_COLORS = ['#58a6ff', '#f85149', '#d29922', '#bc8cff', '#3fb950', '#39c5cf'];
 
 type ThrowResult = { status: 'valid' | 'bust' | 'leg-win' | 'match-win'; scoreRemaining: number } | null;
 
@@ -51,23 +53,23 @@ export default function Home() {
     rerender();
   }
 
-  function throwValue(value: number, isDouble: boolean) {
+  function throwAt(segment: number, dartMultiplier: 1 | 2 | 3) {
     const engine = engineRef.current;
     if (!engine || engine.isMatchOver || engine.isLegOver) return;
-    const result = engine.throwDart(value, isDouble);
+    const result = engine.throwDart(segment, dartMultiplier);
     setLastResult(result);
   }
 
   function throwSegment(segment: number) {
-    throwValue(segment * multiplier, multiplier === 2);
+    throwAt(segment, multiplier);
   }
 
   function throwBull(double: boolean) {
-    throwValue(double ? 50 : 25, double);
+    throwAt(25, double ? 2 : 1);
   }
 
   function throwMiss() {
-    throwValue(0, false);
+    throwAt(0, 1);
   }
 
   function undoTurn() {
@@ -274,6 +276,20 @@ export default function Home() {
             </div>
           ))}
         </details>
+      </div>
+
+      <div className="card">
+        <h2 className="section-title">Kastfordeling</h2>
+        <div className="dartboard-grid">
+          {engine.players.map((p, i) => (
+            <div key={p.id} className="dartboard-cell">
+              <div className="dartboard-cell-title">
+                {p.name} <span className="dartboard-cell-count">({p.dartsThrown.length} kast)</span>
+              </div>
+              <DartBoard throws={p.dartsThrown} dotColor={PLAYER_COLORS[i % PLAYER_COLORS.length]} />
+            </div>
+          ))}
+        </div>
       </div>
     </main>
   );
