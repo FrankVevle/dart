@@ -1,6 +1,9 @@
 'use client';
 
+import { useId } from 'react';
 import type { DartThrow } from '@/lib/DartsMatchEngine';
+
+const AVATAR_MARKER_RADIUS = 9;
 
 // Standard dartboard wedge order, clockwise from the top.
 const ORDER = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
@@ -63,9 +66,26 @@ function throwPosition(t: DartThrow, index: number) {
   return polar(r, angle);
 }
 
-export function DartBoard({ throws, dotColor = '#e0483e' }: { throws: DartThrow[]; dotColor?: string }) {
+export function DartBoard({
+  throws,
+  dotColor = '#e0483e',
+  avatarUrl
+}: {
+  throws: DartThrow[];
+  dotColor?: string;
+  avatarUrl?: string;
+}) {
+  const clipId = `dart-avatar-clip-${useId()}`;
+
   return (
     <svg viewBox={`0 0 ${SIZE} ${SIZE}`} width="100%" role="img" aria-label="Dartskive">
+      {avatarUrl && (
+        <defs>
+          <clipPath id={clipId}>
+            <circle cx={0} cy={0} r={AVATAR_MARKER_RADIUS} />
+          </clipPath>
+        </defs>
+      )}
       <circle cx={CX} cy={CY} r={R_DOUBLE_OUT + 2} fill="#111820" />
       {ORDER.map((num, i) => {
         const start = i * 18 - 9;
@@ -94,6 +114,22 @@ export function DartBoard({ throws, dotColor = '#e0483e' }: { throws: DartThrow[
       })}
       {throws.map((t, i) => {
         const pos = throwPosition(t, i);
+        if (avatarUrl) {
+          return (
+            <g key={i} transform={`translate(${pos.x} ${pos.y})`}>
+              <circle r={AVATAR_MARKER_RADIUS + 1} fill="white" />
+              <image
+                href={avatarUrl}
+                x={-AVATAR_MARKER_RADIUS}
+                y={-AVATAR_MARKER_RADIUS}
+                width={AVATAR_MARKER_RADIUS * 2}
+                height={AVATAR_MARKER_RADIUS * 2}
+                clipPath={`url(#${clipId})`}
+                preserveAspectRatio="xMidYMid slice"
+              />
+            </g>
+          );
+        }
         return <circle key={i} cx={pos.x} cy={pos.y} r={4.5} fill={dotColor} stroke="white" strokeWidth={0.75} opacity={0.9} />;
       })}
     </svg>

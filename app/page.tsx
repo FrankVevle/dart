@@ -7,15 +7,43 @@ import { DartBoard } from './components/DartBoard';
 const STORAGE_KEY = 'darts-match-state';
 const SEGMENTS = Array.from({ length: 20 }, (_, i) => i + 1);
 const PLAYER_COLORS = ['#58a6ff', '#f85149', '#d29922', '#bc8cff', '#3fb950', '#39c5cf'];
+const AVATAR_MAX_SIZE = 128;
 
 type ThrowResult = { status: 'valid' | 'bust' | 'leg-win' | 'match-win'; scoreRemaining: number } | null;
+type PlayerSetup = { name: string; photo?: string };
+
+// Downscale to a small square JPEG data URL so avatars don't blow up localStorage.
+function resizeImageToDataUrl(file: File, maxSize = AVATAR_MAX_SIZE): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(reader.error);
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('Kunne ikke lese bildet'));
+      img.onload = () => {
+        const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return reject(new Error('Canvas ikke støttet'));
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 export default function Home() {
   const engineRef = useRef<DartsMatchEngine | null>(null);
   const [, bumpVersion] = useState(0);
   const rerender = () => bumpVersion(v => v + 1);
 
-  const [playerNames, setPlayerNames] = useState(['Spiller 1', 'Spiller 2']);
+  const [playerSetups, setPlayerSetups] = useState<PlayerSetup[]>([{ name: 'Spiller 1' }, { name: 'Spiller 2' }]);
   const [startingScore, setStartingScore] = useState<301 | 501>(501);
   const [doubleOut, setDoubleOut] = useState(true);
   const [legsToWin, setLegsToWin] = useState(3);
@@ -37,13 +65,27 @@ export default function Home() {
   }
 
   function startMatch() {
-    const names = playerNames.map(n => n.trim()).filter(Boolean);
-    if (names.length < 1) return;
+    const setups = playerSetups.filter(p => p.name.trim().length > 0);
+    if (setups.length < 1) return;
     const config: MatchConfig = { startingScore, doubleOut, legsToWin: Math.max(1, legsToWin) };
-    engineRef.current = new DartsMatchEngine(names, config, persist);
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(engineRef.current.toJSON()));
+    const engine = new DartsMatchEngine(
+      setups.map(p => p.name.trim()),
+      config,
+      persist
+    );
+    engine.players.forEach((player, i) => {
+      player.photo = setups[i].photo;
+    });
+    engineRef.current = engine;
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(engine.toJSON()));
     setLastResult(null);
     rerender();
+  }
+
+  async function handlePhotoChange(index: number, file: File | undefined) {
+    if (!file) return;
+    const dataUrl = await resizeImageToDataUrl(file);
+    setPlayerSetups(setups => setups.map((p, i) => (i === index ? { ...p, photo: dataUrl } : p)));
   }
 
   function newMatch() {
@@ -90,27 +132,40 @@ export default function Home() {
         <h1>301 / 501 Darts</h1>
         <div className="card">
           <label>Spillere</label>
-          {playerNames.map((name, i) => (
+          {playerSetups.map((setup, i) => (
             <div className="player-row" key={i}>
+              <label className="avatar-picker">
+                {setup.photo ? (
+                  <img src={setup.photo} alt="" className="avatar-preview" />
+                ) : (
+                  <span className="avatar-placeholder">+</span>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="avatar-input"
+                  onChange={e => handlePhotoChange(i, e.target.files?.[0])}
+                />
+              </label>
               <input
                 type="text"
-                value={name}
+                value={setup.name}
                 onChange={e => {
-                  const next = [...playerNames];
-                  next[i] = e.target.value;
-                  setPlayerNames(next);
+                  const next = [...playerSetups];
+                  next[i] = { ...next[i], name: e.target.value };
+                  setPlayerSetups(next);
                 }}
                 placeholder={`Spiller ${i + 1}`}
               />
-              {playerNames.length > 1 && (
-                <button className="btn remove" onClick={() => setPlayerNames(playerNames.filter((_, idx) => idx !== i))}>
+              {playerSetups.length > 1 && (
+                <button className="btn remove" onClick={() => setPlayerSetups(playerSetups.filter((_, idx) => idx !== i))}>
                   ✕
                 </button>
               )}
             </div>
           ))}
           <div className="btn-row">
-            <button className="btn" onClick={() => setPlayerNames([...playerNames, `Spiller ${playerNames.length + 1}`])}>
+            <button className="btn" onClick={() => setPlayerSetups([...playerSetups, { name: `Spiller ${playerSetups.length + 1}` }])}>
               + Legg til spiller
             </button>
           </div>
@@ -286,7 +341,7 @@ export default function Home() {
               <div className="dartboard-cell-title">
                 {p.name} <span className="dartboard-cell-count">({p.dartsThrown.length} kast)</span>
               </div>
-              <DartBoard throws={p.dartsThrown} dotColor={PLAYER_COLORS[i % PLAYER_COLORS.length]} />
+              <DartBoard throws={p.dartsThrown} dotColor={PLAYER_COLORS[i % PLAYER_COLORS.length]} avatarUrl={p.photo} />
             </div>
           ))}
         </div>

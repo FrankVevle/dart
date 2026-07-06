@@ -11,6 +11,7 @@ export interface DartPlayer {
   legsWon: number;
   history: number[][][]; // history[legIndex][turnIndex] = darts, e.g. [[[20,60,5],[20,20,20]], [[60,60,60]]]
   dartsThrown: DartThrow[]; // every real (non-miss) dart this player has thrown, for board visualization
+  photo?: string; // optional data URL, shown as the marker for this player's darts on the board
 }
 
 export interface MatchConfig {
