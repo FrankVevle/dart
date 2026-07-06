@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { DartsMatchEngine, MatchConfig, MatchState } from '@/lib/DartsMatchEngine';
+import { DartsMatchEngine, MatchConfig, MatchState, DartThrow } from '@/lib/DartsMatchEngine';
 import { DartBoard } from './components/DartBoard';
+import { CameraScoring } from './components/CameraScoring';
 
 const STORAGE_KEY = 'darts-match-state';
 const SEGMENTS = Array.from({ length: 20 }, (_, i) => i + 1);
@@ -97,9 +98,10 @@ export default function Home() {
 
   function throwAt(segment: number, dartMultiplier: 1 | 2 | 3) {
     const engine = engineRef.current;
-    if (!engine || engine.isMatchOver || engine.isLegOver) return;
+    if (!engine || engine.isMatchOver || engine.isLegOver) return undefined;
     const result = engine.throwDart(segment, dartMultiplier);
     setLastResult(result);
+    return result;
   }
 
   function throwSegment(segment: number) {
@@ -112,6 +114,18 @@ export default function Home() {
 
   function throwMiss() {
     throwAt(0, 1);
+  }
+
+  // Applies a batch of camera-detected/confirmed darts as one turn. Stops early if a dart
+  // busts, wins the leg, or wins the match — the rest of the batch would belong to whatever
+  // comes next, not this turn.
+  function applyDetectedThrows(throwsToApply: DartThrow[]) {
+    for (const t of throwsToApply) {
+      const engine = engineRef.current;
+      if (!engine || engine.currentTurnDarts.length >= 3) break;
+      const result = throwAt(t.segment, t.multiplier);
+      if (!result || result.status !== 'valid') break;
+    }
   }
 
   function undoTurn() {
@@ -307,6 +321,13 @@ export default function Home() {
             Avslutt kamp
           </button>
         </div>
+      </div>
+
+      <div className="card">
+        <details>
+          <summary>📷 Kamera-scoring (eksperimentell)</summary>
+          <CameraScoring onConfirmThrows={applyDetectedThrows} />
+        </details>
       </div>
 
       <div className="card">

@@ -2,21 +2,21 @@
 
 import { useId } from 'react';
 import type { DartThrow } from '@/lib/DartsMatchEngine';
+import { WEDGE_ORDER, RADIUS_RATIO } from '@/lib/dartboardGeometry';
 
 const AVATAR_MARKER_RADIUS = 9;
 
-// Standard dartboard wedge order, clockwise from the top.
-const ORDER = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
+const ORDER = WEDGE_ORDER;
 
 const SIZE = 360;
 const CX = SIZE / 2;
 const CY = SIZE / 2;
-const R_BULLSEYE = 12;
-const R_BULL = 30;
-const R_TRIPLE_IN = 95;
-const R_TRIPLE_OUT = 115;
-const R_DOUBLE_IN = 150;
 const R_DOUBLE_OUT = 160;
+const R_BULLSEYE = RADIUS_RATIO.bullseye * R_DOUBLE_OUT;
+const R_BULL = RADIUS_RATIO.bull * R_DOUBLE_OUT;
+const R_TRIPLE_IN = RADIUS_RATIO.tripleIn * R_DOUBLE_OUT;
+const R_TRIPLE_OUT = RADIUS_RATIO.tripleOut * R_DOUBLE_OUT;
+const R_DOUBLE_IN = RADIUS_RATIO.doubleIn * R_DOUBLE_OUT;
 const R_LABEL = 172;
 
 // Deterministic pseudo-random in [0,1) so a given throw's dot stays put across re-renders.
