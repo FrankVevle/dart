@@ -441,85 +441,6 @@ details summary {
   font-weight: 400;
 }
 
-.camera-scoring {
-  margin-top: 12px;
-}
-
-.camera-hint {
-  color: #8b949e;
-  font-size: 0.85rem;
-  margin: 0 0 12px;
-  line-height: 1.4;
-}
-
-.camera-upload-btn {
-  position: relative;
-  display: block;
-  text-align: center;
-  margin-bottom: 12px;
-}
-
-.camera-canvas {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 8px;
-  border: 1px solid #30363d;
-  background: #000;
-  cursor: crosshair;
-  touch-action: manipulation;
-  margin-bottom: 12px;
-}
-
-.camera-status {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.9rem;
-  margin-bottom: 12px;
-  gap: 10px;
-}
-
-.camera-review-wrapper {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 8px;
-  border: 1px solid #30363d;
-  overflow: hidden;
-  cursor: crosshair;
-  margin-bottom: 12px;
-}
-
-.camera-review-image {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-}
-
-.camera-marker {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  background: rgba(13, 17, 23, 0.85);
-  border: 2px solid #3fb950;
-  color: white;
-  border-radius: 999px;
-  padding: 3px 8px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  white-space: nowrap;
-  touch-action: manipulation;
-}
-
-.camera-marker-miss {
-  border-color: #f85149;
-  color: #f85149;
-}
-
-.camera-mode-toggle {
-  margin-bottom: 12px;
-}
-
 .help-overlay {
   position: fixed;
   inset: 0;
@@ -590,4 +511,32 @@ details summary {
 
 .help-modal li {
   margin-bottom: 4px;
+}
+
+.confetti-overlay {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 300;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  border-radius: 1px;
+  animation-name: confetti-fall;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--confetti-drift), 110vh) rotate(var(--confetti-rotate));
+    opacity: 0.9;
+  }
 }

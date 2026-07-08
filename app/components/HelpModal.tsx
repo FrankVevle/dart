@@ -58,23 +58,6 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
         </section>
 
         <section>
-          <h3>Kamera-scoring (eksperimentell)</h3>
-          <ul>
-            <li>Kalibrer én gang: ta et bilde av skiva, trykk midt i blinken, og trykk deretter øverst på skiva.</li>
-            <li>
-              <strong>Automatisk gjenkjenning</strong>: kalibreringsbildet må vise en tom skive. Ta så bilde etter hver tur
-              fra nøyaktig samme kameraposisjon — appen finner pilene ved å sammenligne bildene.
-            </li>
-            <li>
-              <strong>Manuell registrering</strong>: ta ett bilde og trykk selv der hver pil landet — ingen tom-skive-bilde
-              nødvendig.
-            </li>
-            <li>I begge modus kan du trykke på et feil kast for å fjerne det, eller trykke et sted for å legge til et som mangler.</li>
-            <li>Automatisk gjenkjenning kan bomme, spesielt nær grensen mellom to felt — sjekk alltid før du bekrefter.</li>
-          </ul>
-        </section>
-
-        <section>
           <h3>Avslutte kampen</h3>
           <p>
             «Avslutt kamp» er den eneste veien tilbake til spilleroppsettet. Den ber om bekreftelse siden fremgangen i

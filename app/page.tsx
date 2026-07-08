@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { DartsMatchEngine, MatchConfig, MatchState, DartThrow } from '@/lib/DartsMatchEngine';
+import { DartsMatchEngine, MatchConfig, MatchState } from '@/lib/DartsMatchEngine';
 import { DartBoard } from './components/DartBoard';
-import { CameraScoring } from './components/CameraScoring';
 import { HelpModal } from './components/HelpModal';
+import { Confetti } from './components/Confetti';
 
 const STORAGE_KEY = 'darts-match-state';
 const SEGMENTS = Array.from({ length: 20 }, (_, i) => i + 1);
@@ -53,6 +53,7 @@ export default function Home() {
   const [multiplier, setMultiplier] = useState<1 | 2 | 3>(1);
   const [lastResult, setLastResult] = useState<ThrowResult>(null);
   const [showHelp, setShowHelp] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(STORAGE_KEY);
@@ -120,22 +121,11 @@ export default function Home() {
 
   function throwBull(double: boolean) {
     throwAt(25, double ? 2 : 1);
+    if (double) setShowConfetti(true);
   }
 
   function throwMiss() {
     throwAt(0, 1);
-  }
-
-  // Applies a batch of camera-detected/confirmed darts as one turn. Stops early if a dart
-  // busts, wins the leg, or wins the match — the rest of the batch would belong to whatever
-  // comes next, not this turn.
-  function applyDetectedThrows(throwsToApply: DartThrow[]) {
-    for (const t of throwsToApply) {
-      const engine = engineRef.current;
-      if (!engine || engine.currentTurnDarts.length >= 3) break;
-      const result = throwAt(t.segment, t.multiplier);
-      if (!result || result.status !== 'valid') break;
-    }
   }
 
   function undoTurn() {
@@ -282,6 +272,7 @@ export default function Home() {
     <main className="page">
       {header}
       {helpModal}
+      <Confetti active={showConfetti} onDone={() => setShowConfetti(false)} />
 
       {lastResult?.status === 'bust' && <div className="status-banner bust">BUST! Turen telles ikke.</div>}
       {lastResult?.status === 'valid' && engine.currentTurnDarts.length === 0 && (
@@ -345,13 +336,6 @@ export default function Home() {
             Avslutt kamp
           </button>
         </div>
-      </div>
-
-      <div className="card">
-        <details>
-          <summary>📷 Kamera-scoring (eksperimentell)</summary>
-          <CameraScoring onConfirmThrows={applyDetectedThrows} />
-        </details>
       </div>
 
       <div className="card">
