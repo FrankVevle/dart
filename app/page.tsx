@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { DartsMatchEngine, MatchConfig, MatchState, DartThrow } from '@/lib/DartsMatchEngine';
 import { DartBoard } from './components/DartBoard';
 import { CameraScoring } from './components/CameraScoring';
+import { HelpModal } from './components/HelpModal';
 
 const STORAGE_KEY = 'darts-match-state';
 const SEGMENTS = Array.from({ length: 20 }, (_, i) => i + 1);
@@ -51,6 +52,7 @@ export default function Home() {
 
   const [multiplier, setMultiplier] = useState<1 | 2 | 3>(1);
   const [lastResult, setLastResult] = useState<ThrowResult>(null);
+  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(STORAGE_KEY);
@@ -148,10 +150,21 @@ export default function Home() {
 
   const engine = engineRef.current;
 
+  const header = (
+    <div className="page-header">
+      <h1>301 / 501 Darts</h1>
+      <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Hjelp">
+        ?
+      </button>
+    </div>
+  );
+  const helpModal = showHelp && <HelpModal onClose={() => setShowHelp(false)} />;
+
   if (!engine) {
     return (
       <main className="page">
-        <h1>301 / 501 Darts</h1>
+        {header}
+        {helpModal}
         <div className="card">
           <label>Spillere</label>
           {playerSetups.map((setup, i) => (
@@ -229,7 +242,8 @@ export default function Home() {
     const winner = engine.players.find(p => p.id === engine.matchWinnerId);
     return (
       <main className="page">
-        <h1>301 / 501 Darts</h1>
+        {header}
+        {helpModal}
         <div className="card overlay">
           <h2>🏆 {winner?.name} vant kampen!</h2>
           <p>
@@ -247,7 +261,8 @@ export default function Home() {
     const winner = engine.players.find(p => p.id === engine.legWinnerId);
     return (
       <main className="page">
-        <h1>301 / 501 Darts</h1>
+        {header}
+        {helpModal}
         <div className="card overlay">
           <h2>{winner?.name} vant legen!</h2>
           <p>{engine.players.map(p => `${p.name}: ${p.legsWon} legs`).join(' · ')}</p>
@@ -265,7 +280,8 @@ export default function Home() {
 
   return (
     <main className="page">
-      <h1>301 / 501 Darts</h1>
+      {header}
+      {helpModal}
 
       {lastResult?.status === 'bust' && <div className="status-banner bust">BUST! Turen telles ikke.</div>}
       {lastResult?.status === 'valid' && engine.currentTurnDarts.length === 0 && (

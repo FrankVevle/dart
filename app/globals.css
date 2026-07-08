@@ -23,9 +23,38 @@ body {
 
 h1 {
   font-size: 1.5rem;
-  margin: 0 0 24px;
+  margin: 0;
   text-align: center;
   letter-spacing: 0.02em;
+}
+
+.page-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.help-btn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #30363d;
+  background: #21262d;
+  color: #e6edf3;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.help-btn:hover {
+  background: #30363d;
 }
 
 .card {
@@ -489,4 +518,76 @@ details summary {
 
 .camera-mode-toggle {
   margin-bottom: 12px;
+}
+
+.help-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px calc(24px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.help-modal {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 560px;
+  width: 100%;
+  margin: auto 0;
+}
+
+.help-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  gap: 12px;
+}
+
+.help-modal-header h2 {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.help-close {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  padding: 0;
+}
+
+.help-modal section {
+  margin-top: 18px;
+}
+
+.help-modal h3 {
+  font-size: 0.95rem;
+  color: #d29922;
+  margin: 0 0 8px;
+}
+
+.help-modal p {
+  color: #c9d1d9;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.help-modal ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #c9d1d9;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.help-modal li {
+  margin-bottom: 4px;
 }
