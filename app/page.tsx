@@ -5,6 +5,7 @@ import { DartsMatchEngine, MatchConfig, MatchState } from '@/lib/DartsMatchEngin
 import { DartBoard } from './components/DartBoard';
 import { HelpModal } from './components/HelpModal';
 import { Confetti } from './components/Confetti';
+import { Fireworks } from './components/Fireworks';
 
 const STORAGE_KEY = 'darts-match-state';
 const SEGMENTS = Array.from({ length: 20 }, (_, i) => i + 1);
@@ -234,6 +235,7 @@ export default function Home() {
       <main className="page">
         {header}
         {helpModal}
+        <Fireworks active={true} />
         <div className="card overlay">
           <h2>🏆 {winner?.name} vant kampen!</h2>
           <p>
