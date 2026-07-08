@@ -198,7 +198,6 @@ export function CameraScoring({ onConfirmThrows }: { onConfirmThrows: (throws: D
               <input
                 type="file"
                 accept="image/*"
-                capture="environment"
                 className="avatar-input"
                 onChange={e => handleReferenceFile(e.target, e.target.files?.[0])}
               />
@@ -241,7 +240,6 @@ export function CameraScoring({ onConfirmThrows }: { onConfirmThrows: (throws: D
               <input
                 type="file"
                 accept="image/*"
-                capture="environment"
                 className="avatar-input"
                 onChange={e => handleThrowPhotoFile(e.target, e.target.files?.[0])}
               />
