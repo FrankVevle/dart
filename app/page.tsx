@@ -96,6 +96,14 @@ export default function Home() {
     rerender();
   }
 
+  // The only way back to the player-setup screen is ending the current match — make that
+  // explicit and require confirmation so it's not an accidental tap that loses progress.
+  function endMatchAndReturnToSetup() {
+    if (window.confirm('Avslutte kampen og gå tilbake til spilleroppsett? Fremgangen i denne kampen forsvinner.')) {
+      newMatch();
+    }
+  }
+
   function throwAt(segment: number, dartMultiplier: 1 | 2 | 3) {
     const engine = engineRef.current;
     if (!engine || engine.isMatchOver || engine.isLegOver) return undefined;
@@ -317,7 +325,7 @@ export default function Home() {
           <button className="btn" onClick={undoTurn} disabled={engine.currentTurnDarts.length === 0}>
             Angre denne turen
           </button>
-          <button className="btn" onClick={newMatch}>
+          <button className="btn" onClick={endMatchAndReturnToSetup}>
             Avslutt kamp
           </button>
         </div>
