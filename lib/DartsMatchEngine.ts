@@ -14,6 +14,23 @@ export interface DartPlayer {
   photo?: string; // optional data URL, shown as the marker for this player's darts on the board
 }
 
+// Every dart that can be thrown as a non-final dart in a checkout combo (any single/double/
+// triple/bull), ordered so the search below tends to surface the biggest/most common throws
+// first (e.g. T20 over S20) when several options score the same.
+const DART_OPTIONS: Array<{ value: number; label: string }> = [
+  ...Array.from({ length: 20 }, (_, i) => ({ value: (20 - i) * 3, label: `T${20 - i}` })),
+  ...Array.from({ length: 20 }, (_, i) => ({ value: (20 - i) * 2, label: `D${20 - i}` })),
+  { value: 50, label: 'BULLSEYE' },
+  ...Array.from({ length: 20 }, (_, i) => ({ value: 20 - i, label: `S${20 - i}` })),
+  { value: 25, label: 'BULL' }
+];
+
+// Darts that can legally end a double-out leg.
+const DOUBLE_OPTIONS: Array<{ value: number; label: string }> = [
+  { value: 50, label: 'BULLSEYE' },
+  ...Array.from({ length: 20 }, (_, i) => ({ value: (20 - i) * 2, label: `D${20 - i}` }))
+];
+
 export interface MatchConfig {
   startingScore: 301 | 501;
   doubleOut: boolean;
@@ -254,25 +271,36 @@ export class DartsMatchEngine {
   }
 
   /**
-   * Simple checkout hint engine helper
+   * Finds a valid up-to-3-dart checkout for the given remaining score, respecting whether
+   * the match requires a double (or bullseye) to finish. Returns null if there's no way to
+   * finish in 3 darts or fewer — including the seven classic "bogey" scores (169, 168, 166,
+   * 165, 163, 162, 159) that no combination of real dart values can reach.
    */
   public getCheckoutHint(score: number): string[] | null {
-    if (score > 170 || score < 2) return null;
-    // Standard high checkouts exceptions that aren't possible:
-    if ([169, 168, 166, 165, 163, 162, 159].includes(score)) return null;
+    if (score > 170 || score <= 0) return null;
 
-    // Common outshot reference map for visualization
-    const commonFinishes: Record<number, string[]> = {
-      170: ['T20', 'T20', 'BULL'],
-      167: ['T20', 'T19', 'BULL'],
-      100: ['T20', 'D20'],
-      60: ['S20', 'D20'],
-      50: ['BULL'],
-      40: ['D20'],
-      32: ['D16']
-    };
+    const finishOptions = this.config.doubleOut ? DOUBLE_OPTIONS : DART_OPTIONS;
 
-    return commonFinishes[score] || [`Check board for custom finish combo mapping to ${score}`];
+    const direct = finishOptions.find(d => d.value === score);
+    if (direct) return [direct.label];
+
+    for (const first of DART_OPTIONS) {
+      if (first.value >= score) continue;
+      const finish = finishOptions.find(d => d.value === score - first.value);
+      if (finish) return [first.label, finish.label];
+    }
+
+    for (const first of DART_OPTIONS) {
+      if (first.value >= score) continue;
+      for (const second of DART_OPTIONS) {
+        const remaining = score - first.value - second.value;
+        if (remaining <= 0) continue;
+        const finish = finishOptions.find(d => d.value === remaining);
+        if (finish) return [first.label, second.label, finish.label];
+      }
+    }
+
+    return null;
   }
 }
 
