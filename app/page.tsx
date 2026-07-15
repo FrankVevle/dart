@@ -53,6 +53,8 @@ export default function Home() {
 
   const [multiplier, setMultiplier] = useState<1 | 2 | 3>(1);
   const [lastResult, setLastResult] = useState<ThrowResult>(null);
+  const [lastThrowWasMiss, setLastThrowWasMiss] = useState(false);
+  const [throwSeq, setThrowSeq] = useState(0);
   const [showHelp, setShowHelp] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -108,11 +110,13 @@ export default function Home() {
     }
   }
 
-  function throwAt(segment: number, dartMultiplier: 1 | 2 | 3) {
+  function throwAt(segment: number, dartMultiplier: 1 | 2 | 3, isMiss = false) {
     const engine = engineRef.current;
     if (!engine || engine.isMatchOver || engine.isLegOver) return undefined;
     const result = engine.throwDart(segment, dartMultiplier);
     setLastResult(result);
+    setLastThrowWasMiss(isMiss);
+    setThrowSeq(s => s + 1);
     return result;
   }
 
@@ -126,7 +130,7 @@ export default function Home() {
   }
 
   function throwMiss() {
-    throwAt(0, 1);
+    throwAt(0, 1, true);
   }
 
   function undoTurn() {
@@ -143,7 +147,9 @@ export default function Home() {
 
   const header = (
     <div className="page-header">
-      <h1>301 / 501 Darts</h1>
+      <h1>
+        301 / 501 <span lang="en">Darts</span>
+      </h1>
       <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Hjelp">
         ?
       </button>
@@ -276,8 +282,17 @@ export default function Home() {
       {helpModal}
       <Confetti active={showConfetti} onDone={() => setShowConfetti(false)} />
 
-      {lastResult?.status === 'bust' && <div className="status-banner bust">BUST! Turen telles ikke.</div>}
-      {lastResult?.status === 'valid' && engine.currentTurnDarts.length === 0 && (
+      {lastResult?.status === 'bust' && (
+        <div key={throwSeq} className="status-banner bust bust-anim">
+          💥 BUST! Turen telles ikke.
+        </div>
+      )}
+      {lastResult?.status === 'valid' && lastThrowWasMiss && (
+        <div key={throwSeq} className="status-banner miss miss-anim">
+          Bom!
+        </div>
+      )}
+      {lastResult?.status === 'valid' && !lastThrowWasMiss && engine.currentTurnDarts.length === 0 && (
         <div className="status-banner valid">Tur registrert.</div>
       )}
 
