@@ -6,6 +6,7 @@ import { DartBoard } from './components/DartBoard';
 import { HelpModal } from './components/HelpModal';
 import { Confetti } from './components/Confetti';
 import { Fireworks } from './components/Fireworks';
+import { announce, playBullseyeSound, playBustSound, playFanfareSound, playMissSound } from '@/lib/audio';
 
 const STORAGE_KEY = 'darts-match-state';
 const SEGMENTS = Array.from({ length: 20 }, (_, i) => i + 1);
@@ -117,6 +118,15 @@ export default function Home() {
     setLastResult(result);
     setLastThrowWasMiss(isMiss);
     setThrowSeq(s => s + 1);
+
+    if (result.status === 'bust') {
+      playBustSound();
+      announce('Bust!');
+    } else if (result.status === 'match-win') {
+      const winner = engine.players.find(p => p.id === engine.matchWinnerId);
+      playFanfareSound();
+      announce(winner ? `${winner.name} wins! Game shot!` : 'Game shot!');
+    }
     return result;
   }
 
@@ -125,12 +135,20 @@ export default function Home() {
   }
 
   function throwBull(double: boolean) {
-    throwAt(25, double ? 2 : 1);
-    if (double) setShowConfetti(true);
+    const result = throwAt(25, double ? 2 : 1);
+    if (double) {
+      setShowConfetti(true);
+      // Don't step on the bust/win announcement that throwAt() already fired.
+      if (result?.status !== 'bust' && result?.status !== 'match-win') {
+        playBullseyeSound();
+        announce('Bullseye!');
+      }
+    }
   }
 
   function throwMiss() {
     throwAt(0, 1, true);
+    playMissSound();
   }
 
   function undoTurn() {
