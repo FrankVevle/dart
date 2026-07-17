@@ -255,16 +255,41 @@ export default function Home() {
 
   if (engine.isMatchOver) {
     const winner = engine.players.find(p => p.id === engine.matchWinnerId);
+    const losers = engine.players.filter(p => p.id !== engine.matchWinnerId);
     return (
       <main className="page">
         {header}
         {helpModal}
         <Fireworks active={true} />
         <div className="card overlay">
-          <h2>🏆 {winner?.name} vant kampen!</h2>
-          <p>
-            {engine.players.map(p => `${p.name}: ${p.legsWon} legs`).join(' · ')}
-          </p>
+          <div className="winner-badge">Winner</div>
+          {winner?.photo ? (
+            <img src={winner.photo} alt="" className="winner-photo" />
+          ) : (
+            <div className="winner-photo winner-photo-placeholder">🏆</div>
+          )}
+          <h2 className="winner-name">{winner?.name}</h2>
+          <p className="winner-legs">{winner?.legsWon} legs</p>
+
+          {losers.length > 0 && (
+            <div className="losers-section">
+              <div className="losers-badge">Losers</div>
+              <div className="losers-list">
+                {losers.map(p => (
+                  <div key={p.id} className="loser-row">
+                    {p.photo ? (
+                      <img src={p.photo} alt="" className="loser-photo" />
+                    ) : (
+                      <div className="loser-photo loser-photo-placeholder">{p.name.charAt(0).toUpperCase()}</div>
+                    )}
+                    <span className="loser-name">{p.name}</span>
+                    <span className="loser-legs">{p.legsWon} legs</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <button className="btn primary" onClick={newMatch}>
             Ny kamp
           </button>
