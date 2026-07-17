@@ -271,32 +271,41 @@ export class DartsMatchEngine {
   }
 
   /**
-   * Finds a valid up-to-3-dart checkout for the given remaining score, respecting whether
-   * the match requires a double (or bullseye) to finish. Returns null if there's no way to
-   * finish in 3 darts or fewer — including the seven classic "bogey" scores (169, 168, 166,
-   * 165, 163, 162, 159) that no combination of real dart values can reach.
+   * Finds a valid checkout for the given remaining score using at most `dartsRemaining`
+   * darts (defaults to a fresh 3-dart turn) — respecting whether the match requires a
+   * double (or bullseye) to finish. Returns null if there's no way to finish within that
+   * many darts, including the seven classic "bogey" scores (169, 168, 166, 165, 163, 162,
+   * 159) that no combination of real dart values can reach in 3.
+   *
+   * Capping the search to the darts actually left in the turn matters: a hint that assumes
+   * 3 fresh darts are always available is nonsense (and misleading) once one or two have
+   * already been thrown this turn.
    */
-  public getCheckoutHint(score: number): string[] | null {
-    if (score > 170 || score <= 0) return null;
+  public getCheckoutHint(score: number, dartsRemaining: number = 3): string[] | null {
+    if (score > 170 || score <= 0 || dartsRemaining <= 0) return null;
 
     const finishOptions = this.config.doubleOut ? DOUBLE_OPTIONS : DART_OPTIONS;
 
     const direct = finishOptions.find(d => d.value === score);
     if (direct) return [direct.label];
 
-    for (const first of DART_OPTIONS) {
-      if (first.value >= score) continue;
-      const finish = finishOptions.find(d => d.value === score - first.value);
-      if (finish) return [first.label, finish.label];
+    if (dartsRemaining >= 2) {
+      for (const first of DART_OPTIONS) {
+        if (first.value >= score) continue;
+        const finish = finishOptions.find(d => d.value === score - first.value);
+        if (finish) return [first.label, finish.label];
+      }
     }
 
-    for (const first of DART_OPTIONS) {
-      if (first.value >= score) continue;
-      for (const second of DART_OPTIONS) {
-        const remaining = score - first.value - second.value;
-        if (remaining <= 0) continue;
-        const finish = finishOptions.find(d => d.value === remaining);
-        if (finish) return [first.label, second.label, finish.label];
+    if (dartsRemaining >= 3) {
+      for (const first of DART_OPTIONS) {
+        if (first.value >= score) continue;
+        for (const second of DART_OPTIONS) {
+          const remaining = score - first.value - second.value;
+          if (remaining <= 0) continue;
+          const finish = finishOptions.find(d => d.value === remaining);
+          if (finish) return [first.label, second.label, finish.label];
+        }
       }
     }
 

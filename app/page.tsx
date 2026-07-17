@@ -347,7 +347,7 @@ export default function Home() {
             <div className="player-legs">{p.legsWon} legs</div>
             {i === engine.currentPlayerIndex && (
               <div className="checkout-hint">
-                {(engine.getCheckoutHint(remainingThisTurn) || []).join(' → ') || ' '}
+                {(engine.getCheckoutHint(remainingThisTurn, 3 - engine.currentTurnDarts.length) || []).join(' → ') || ' '}
               </div>
             )}
           </div>
