@@ -804,3 +804,58 @@ details summary {
   display: block;
   margin-bottom: 20px;
 }
+
+.cricket-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 4px;
+}
+
+.cricket-table th,
+.cricket-table td {
+  text-align: center;
+  padding: 8px 4px;
+  border-bottom: 1px solid #30363d;
+}
+
+.cricket-table th {
+  color: #8b949e;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.cricket-table th:first-child,
+.cricket-table td:first-child {
+  text-align: left;
+  color: #8b949e;
+  font-size: 0.85rem;
+}
+
+.cricket-table td.active-col {
+  background: rgba(31, 111, 235, 0.08);
+}
+
+.cricket-table th.active-col {
+  color: #58a6ff;
+}
+
+.cricket-marks {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.cricket-marks.closed {
+  color: #3fb950;
+}
+
+.cricket-marks.closed-all {
+  color: #8b949e;
+  opacity: 0.5;
+}
+
+.cricket-score-row td {
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding-top: 10px;
+}

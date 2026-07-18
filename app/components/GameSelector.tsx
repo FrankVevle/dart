@@ -25,7 +25,7 @@ const GAMES: Array<{ id: GameType; title: string; description: string; available
     id: 'cricket',
     title: 'Cricket',
     description: 'Lukk 15–20 og bull med 3 treff hver, score på åpne tall motstanderen ikke har lukket.',
-    available: false
+    available: true
   },
   {
     id: 'halveit',
