@@ -31,7 +31,7 @@ const GAMES: Array<{ id: GameType; title: string; description: string; available
     id: 'halveit',
     title: 'Halve-it',
     description: 'Hver runde har et fast mål. Bommer du helt på det, halveres hele poengsummen din.',
-    available: false
+    available: true
   },
   {
     id: 'highlow',
