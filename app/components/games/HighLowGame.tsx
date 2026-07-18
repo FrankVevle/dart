@@ -137,7 +137,7 @@ export function HighLowGame({ onExit }: { onExit: () => void }) {
       </button>
     </div>
   );
-  const helpModal = showHelp && <HelpModal onClose={() => setShowHelp(false)} />;
+  const helpModal = showHelp && <HelpModal game="highlow" onClose={() => setShowHelp(false)} />;
 
   if (!engine) {
     return (

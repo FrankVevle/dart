@@ -144,7 +144,7 @@ export function HalveItGame({ onExit }: { onExit: () => void }) {
       </button>
     </div>
   );
-  const helpModal = showHelp && <HelpModal onClose={() => setShowHelp(false)} />;
+  const helpModal = showHelp && <HelpModal game="halveit" onClose={() => setShowHelp(false)} />;
 
   if (!engine) {
     return (

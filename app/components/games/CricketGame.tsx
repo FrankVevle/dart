@@ -148,7 +148,7 @@ export function CricketGame({ onExit }: { onExit: () => void }) {
       </button>
     </div>
   );
-  const helpModal = showHelp && <HelpModal onClose={() => setShowHelp(false)} />;
+  const helpModal = showHelp && <HelpModal game="cricket" onClose={() => setShowHelp(false)} />;
 
   if (!engine) {
     return (

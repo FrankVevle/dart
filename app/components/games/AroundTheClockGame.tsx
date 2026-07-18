@@ -135,7 +135,7 @@ export function AroundTheClockGame({ onExit }: { onExit: () => void }) {
     </div>
   );
   const helpModal = showHelp && (
-    <HelpModal onClose={() => setShowHelp(false)} />
+    <HelpModal game="clock" onClose={() => setShowHelp(false)} />
   );
 
   if (!engine) {

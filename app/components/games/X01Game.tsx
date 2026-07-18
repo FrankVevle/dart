@@ -189,7 +189,7 @@ export function X01Game({ onExit, duo = false }: { onExit: () => void; duo?: boo
       </button>
     </div>
   );
-  const helpModal = showHelp && <HelpModal onClose={() => setShowHelp(false)} />;
+  const helpModal = showHelp && <HelpModal game={duo ? 'x01-duo' : 'x01'} onClose={() => setShowHelp(false)} />;
 
   if (!engine) {
     return (
