@@ -35,6 +35,9 @@ export interface MatchConfig {
   startingScore: 301 | 501;
   doubleOut: boolean;
   legsToWin: number; // first to this many legs wins the match
+  // "Duo" house rule: whenever a player's score, after a committed turn, exactly matches
+  // another active player's current score, that opponent is sent back to startingScore.
+  sameScorePenalty?: boolean;
 }
 
 // Everything needed to reconstruct a DartsMatchEngine exactly where it left off.
@@ -155,7 +158,7 @@ export class DartsMatchEngine {
   public throwDart(
     segment: number,
     multiplier: 1 | 2 | 3 = 1
-  ): { status: 'valid' | 'bust' | 'leg-win' | 'match-win'; scoreRemaining: number } {
+  ): { status: 'valid' | 'bust' | 'leg-win' | 'match-win'; scoreRemaining: number; sentBackPlayerIds?: string[] } {
     if (this.isMatchOver) throw new Error('Match has already concluded.');
     if (this.isLegOver) throw new Error('Leg has concluded. Call startNextLeg().');
     if (this.currentTurnDarts.length >= 3) throw new Error('Turn already complete. Call commitTurn().');
@@ -211,10 +214,10 @@ export class DartsMatchEngine {
 
     // If they have thrown all 3 darts, auto-commit the turn (commitTurn() notifies on its own)
     if (this.currentTurnDarts.length === 3) {
-      this.commitTurn();
+      const { sentBackPlayerIds } = this.commitTurn();
       const prevIndex =
         this.currentPlayerIndex === 0 ? this.players.length - 1 : this.currentPlayerIndex - 1;
-      return { status: 'valid', scoreRemaining: this.players[prevIndex].currentScore };
+      return { status: 'valid', scoreRemaining: this.players[prevIndex].currentScore, sentBackPlayerIds };
     }
 
     this.notifyChange();
@@ -222,13 +225,15 @@ export class DartsMatchEngine {
   }
 
   /**
-   * Commits the current (possibly partial) 3-dart turn and passes the turn forward
+   * Commits the current (possibly partial) 3-dart turn and passes the turn forward.
+   * Returns the ids of any opponents sent back to startingScore by the "duo" same-score
+   * house rule (see MatchConfig.sameScorePenalty).
    */
-  public commitTurn(): void {
+  public commitTurn(): { sentBackPlayerIds?: string[] } {
     if (this.isMatchOver || this.isLegOver || this.currentTurnDarts.length === 0) {
       this.moveToNextPlayer();
       this.notifyChange();
-      return;
+      return {};
     }
 
     const player = this.getActivePlayer();
@@ -237,9 +242,19 @@ export class DartsMatchEngine {
     player.currentScore -= turnTotal;
     player.history[player.history.length - 1].push([...this.currentTurnDarts]);
 
+    let sentBackPlayerIds: string[] | undefined;
+    if (this.config.sameScorePenalty) {
+      const collisions = this.players.filter(p => p.id !== player.id && p.currentScore === player.currentScore);
+      if (collisions.length > 0) {
+        collisions.forEach(p => (p.currentScore = this.config.startingScore));
+        sentBackPlayerIds = collisions.map(p => p.id);
+      }
+    }
+
     this.currentTurnDarts = [];
     this.moveToNextPlayer();
     this.notifyChange();
+    return { sentBackPlayerIds };
   }
 
   /**
