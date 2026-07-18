@@ -131,6 +131,9 @@ export function HighLowGame({ onExit }: { onExit: () => void }) {
 
   const header = (
     <div className="page-header">
+      <button className="header-back-btn" onClick={onExit} aria-label="Bytt spilltype" title="Bytt spilltype">
+        ←
+      </button>
       <h1>High-Low</h1>
       <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Hjelp">
         ?
@@ -144,9 +147,6 @@ export function HighLowGame({ onExit }: { onExit: () => void }) {
       <main className="page">
         {header}
         {helpModal}
-        <button className="btn back-to-selector" onClick={onExit}>
-          ← Bytt spilltype
-        </button>
         <div className="card">
           <p className="camera-hint">
             Hver runde kaster alle 3 piler. Høyest sum vinner rundepoenget — blir det uavgjort på

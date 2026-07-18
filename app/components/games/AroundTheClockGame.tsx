@@ -128,6 +128,9 @@ export function AroundTheClockGame({ onExit }: { onExit: () => void }) {
 
   const header = (
     <div className="page-header">
+      <button className="header-back-btn" onClick={onExit} aria-label="Bytt spilltype" title="Bytt spilltype">
+        ←
+      </button>
       <h1>Rundt klokka</h1>
       <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Hjelp">
         ?
@@ -143,9 +146,6 @@ export function AroundTheClockGame({ onExit }: { onExit: () => void }) {
       <main className="page">
         {header}
         {helpModal}
-        <button className="btn back-to-selector" onClick={onExit}>
-          ← Bytt spilltype
-        </button>
         <div className="card">
           <p className="camera-hint">
             Treff 1, så 2, så 3 osv. i rekkefølge. Du bommer? Turen er over med én gang. Først til å treffe 20 vinner.

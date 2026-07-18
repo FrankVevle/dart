@@ -138,6 +138,9 @@ export function HalveItGame({ onExit }: { onExit: () => void }) {
 
   const header = (
     <div className="page-header">
+      <button className="header-back-btn" onClick={onExit} aria-label="Bytt spilltype" title="Bytt spilltype">
+        ←
+      </button>
       <h1>Halve-it</h1>
       <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Hjelp">
         ?
@@ -151,9 +154,6 @@ export function HalveItGame({ onExit }: { onExit: () => void }) {
       <main className="page">
         {header}
         {helpModal}
-        <button className="btn back-to-selector" onClick={onExit}>
-          ← Bytt spilltype
-        </button>
         <div className="card">
           <p className="camera-hint">
             10 faste runder: 20, Double, 19, Triple, 18, 17, Bull, 16, 15, Double. Treff målet for runden og

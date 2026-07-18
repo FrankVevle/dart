@@ -57,6 +57,27 @@ h1 {
   background: #30363d;
 }
 
+.header-back-btn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #30363d;
+  background: #21262d;
+  color: #e6edf3;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.header-back-btn:hover {
+  background: #30363d;
+}
+
 .card {
   background: #161b22;
   border: 1px solid #30363d;
@@ -798,11 +819,6 @@ details summary {
   font-size: 0.85rem;
   color: #8b949e;
   line-height: 1.4;
-}
-
-.back-to-selector {
-  display: block;
-  margin-bottom: 20px;
 }
 
 .cricket-table {

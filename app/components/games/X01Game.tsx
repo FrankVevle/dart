@@ -177,6 +177,9 @@ export function X01Game({ onExit, duo = false }: { onExit: () => void; duo?: boo
 
   const header = (
     <div className="page-header">
+      <button className="header-back-btn" onClick={onExit} aria-label="Bytt spilltype" title="Bytt spilltype">
+        ←
+      </button>
       <h1>
         {duo ? '301 / 501 Duo' : (
           <>
@@ -196,9 +199,6 @@ export function X01Game({ onExit, duo = false }: { onExit: () => void; duo?: boo
       <main className="page">
         {header}
         {helpModal}
-        <button className="btn back-to-selector" onClick={onExit}>
-          ← Bytt spilltype
-        </button>
         <div className="card">
           <label>Spillere</label>
           {playerSetups.map((setup, i) => (
