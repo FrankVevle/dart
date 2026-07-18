@@ -7,6 +7,7 @@ import { AroundTheClockGame } from './components/games/AroundTheClockGame';
 import { CricketGame } from './components/games/CricketGame';
 import { HalveItGame } from './components/games/HalveItGame';
 import { HighLowGame } from './components/games/HighLowGame';
+import { KillerGame } from './components/games/KillerGame';
 
 const ACTIVE_GAME_KEY = 'darts-active-game-type';
 
@@ -18,7 +19,8 @@ const MATCH_STATE_KEYS: Record<GameType, string> = {
   clock: 'darts-clock-state',
   cricket: 'darts-cricket-state',
   halveit: 'darts-halveit-state',
-  highlow: 'darts-highlow-state'
+  highlow: 'darts-highlow-state',
+  killer: 'darts-killer-state'
 };
 
 export default function Home() {
@@ -55,6 +57,7 @@ export default function Home() {
   if (gameType === 'cricket') return <CricketGame onExit={exitToSelector} />;
   if (gameType === 'halveit') return <HalveItGame onExit={exitToSelector} />;
   if (gameType === 'highlow') return <HighLowGame onExit={exitToSelector} />;
+  if (gameType === 'killer') return <KillerGame onExit={exitToSelector} />;
 
   return <GameSelector onSelect={selectGame} />;
 }

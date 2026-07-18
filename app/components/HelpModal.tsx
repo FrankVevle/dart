@@ -240,6 +240,47 @@ const HELP_CONTENT: Record<GameType, HelpContent> = {
         items: ['«Avslutt kamp» er den eneste veien tilbake til spilleroppsettet. Den ber om bekreftelse siden fremgangen i kampen forsvinner.']
       }
     ]
+  },
+  killer: {
+    title: 'Killer',
+    sections: [
+      {
+        heading: 'Reglene',
+        items: [
+          'Hver spiller får tilfeldig tildelt et eget tall (1–20) når kampen starter.',
+          'Så lenge du ikke er «killer» ennå: treff ditt eget tall for å bygge merker — single gir 1 merke, double gir 2, triple gir 3 (som i Cricket). Andre tall gjør ingenting.',
+          'Når du når 3 merker på eget tall, blir du en Killer.',
+          'Som Killer kan du treffe en motstanders tall for å fjerne liv fra dem — antall liv tapt tilsvarer multiplikatoren (single=1, double=2, triple=3).',
+          'Advarsel: treffer du ditt EGET tall etter at du er blitt Killer, mister du selv like mange liv («friendly fire»).',
+          'En spiller som når 0 liv er ute av kampen. Siste spiller igjen med liv vinner.'
+        ]
+      },
+      {
+        heading: 'Sette opp en kamp',
+        items: [
+          'Legg til minst 2 spillere, gi dem navn og eventuelt et bilde.',
+          'Velg hvor mange liv hver spiller skal starte med.'
+        ]
+      },
+      {
+        heading: 'Registrere kast manuelt',
+        items: [
+          'Velg Single, Double eller Triple, og trykk deretter på tallet pilen traff.',
+          'Bom registrerer 0 poeng.'
+        ]
+      },
+      {
+        heading: 'Scoreboard og kastfordeling',
+        items: [
+          'Hvert spillerkort viser eget tall, liv igjen (eller «Ute» hvis eliminert), og om du fortsatt bygger merker eller allerede er Killer.',
+          '«Kastfordeling» viser en virtuell dartskive per spiller med et merke for hvert kast.'
+        ]
+      },
+      {
+        heading: 'Avslutte kampen',
+        items: ['«Avslutt kamp» er den eneste veien tilbake til spilleroppsettet. Den ber om bekreftelse siden fremgangen i kampen forsvinner.']
+      }
+    ]
   }
 };
 

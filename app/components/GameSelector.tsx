@@ -1,6 +1,6 @@
 'use client';
 
-export type GameType = 'x01' | 'x01-duo' | 'clock' | 'cricket' | 'halveit' | 'highlow';
+export type GameType = 'x01' | 'x01-duo' | 'clock' | 'cricket' | 'halveit' | 'highlow' | 'killer';
 
 const GAMES: Array<{ id: GameType; title: string; description: string; available: boolean }> = [
   {
@@ -37,6 +37,12 @@ const GAMES: Array<{ id: GameType; title: string; description: string; available
     id: 'highlow',
     title: 'High-Low',
     description: 'Høyest sum på 3 piler vinner runden. Først til flest rundeseiere vinner.',
+    available: true
+  },
+  {
+    id: 'killer',
+    title: 'Killer',
+    description: 'Treff eget tall 3 ganger for å bli Killer, fjern liv fra motstandere. Siste spiller igjen vinner.',
     available: true
   }
 ];
