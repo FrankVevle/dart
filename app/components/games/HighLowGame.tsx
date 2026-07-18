@@ -117,6 +117,7 @@ export function HighLowGame({ onExit }: { onExit: () => void }) {
 
   function throwSegment(segment: number) {
     throwAt(segment, multiplier);
+    if (multiplier !== 1) setMultiplier(1);
   }
 
   function throwBull(double: boolean) {

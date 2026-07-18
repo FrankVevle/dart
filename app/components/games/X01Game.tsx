@@ -144,6 +144,7 @@ export function X01Game({ onExit, duo = false }: { onExit: () => void; duo?: boo
 
   function throwSegment(segment: number) {
     throwAt(segment, multiplier);
+    if (multiplier !== 1) setMultiplier(1);
   }
 
   function throwBull(double: boolean) {

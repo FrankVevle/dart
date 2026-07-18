@@ -118,6 +118,7 @@ export function AroundTheClockGame({ onExit }: { onExit: () => void }) {
 
   function throwSegment(segment: number) {
     throwAt(segment, multiplier);
+    if (multiplier !== 1) setMultiplier(1);
   }
 
   function throwMiss() {
