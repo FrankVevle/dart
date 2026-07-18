@@ -6,6 +6,7 @@ import { X01Game } from './components/games/X01Game';
 import { AroundTheClockGame } from './components/games/AroundTheClockGame';
 import { CricketGame } from './components/games/CricketGame';
 import { HalveItGame } from './components/games/HalveItGame';
+import { HighLowGame } from './components/games/HighLowGame';
 
 const ACTIVE_GAME_KEY = 'darts-active-game-type';
 
@@ -35,6 +36,7 @@ export default function Home() {
   if (gameType === 'clock') return <AroundTheClockGame onExit={exitToSelector} />;
   if (gameType === 'cricket') return <CricketGame onExit={exitToSelector} />;
   if (gameType === 'halveit') return <HalveItGame onExit={exitToSelector} />;
+  if (gameType === 'highlow') return <HighLowGame onExit={exitToSelector} />;
 
   return <GameSelector onSelect={selectGame} />;
 }

@@ -37,7 +37,7 @@ const GAMES: Array<{ id: GameType; title: string; description: string; available
     id: 'highlow',
     title: 'High-Low',
     description: 'Høyest sum på 3 piler vinner runden. Først til flest rundeseiere vinner.',
-    available: false
+    available: true
   }
 ];
 
