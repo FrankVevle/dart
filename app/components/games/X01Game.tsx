@@ -49,7 +49,7 @@ export function X01Game({ onExit, duo = false }: { onExit: () => void; duo?: boo
 
   const [playerSetups, setPlayerSetups] = useState<PlayerSetup[]>([{ name: 'Spiller 1' }, { name: 'Spiller 2' }]);
   const [startingScore, setStartingScore] = useState<301 | 501>(501);
-  const [doubleOut, setDoubleOut] = useState(true);
+  const [doubleOut, setDoubleOut] = useState(false);
   const [sameScorePenalty, setSameScorePenalty] = useState(duo);
   const [legsToWin, setLegsToWin] = useState(3);
 
